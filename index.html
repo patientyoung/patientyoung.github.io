@@ -82,20 +82,6 @@
     }
 
     /* Loader */
-    .loader-card{
-      width:min(520px, 90%);
-      background:rgba(255,255,255,.55);
-      border:1px solid rgba(212,215,225,.9);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:22px 18px;
-    }
-    .loader-top{display:flex; align-items:center; justify-content:space-between; gap:12px}
-    .loader-brand{display:flex; align-items:center; gap:10px}
-    .loader-title{font-weight:800; letter-spacing:.02em}
-    .loader-sub{color:var(--ink-muted); font-size:.95rem}
-    .loader-meta{display:flex; justify-content:space-between; margin-top:10px; color:var(--ink-muted); font-size:.9rem}
-
     /* Page transition overlay */
     #transition{
       position:fixed; inset:0; z-index:9980; pointer-events:none;
@@ -677,7 +663,6 @@ dialog{
   scroll-margin-top: calc(var(--header-h) + var(--safe-top) + 14px);
 }
 
-
 /* === ANDROID / PIXEL (Chrome) RELIABILITY PATCH === */
 /* Fixes common issues with sticky + backdrop-filter and dropdown positioning on some Android devices. */
 
@@ -722,22 +707,6 @@ body.nav-open{ overflow:hidden; }
 <body>
   <div class="backdrop" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
-
-  <!-- Loader -->
-<div>
-            <div class="loader-title">Dongyoung Kim</div>
-            <div class="loader-sub">Engineering portfolio</div>
-          </div>
-        </div>
-        <div class="loader-sub"><span id="pct">0</span>%</div>
-      </div>
-      <div class="bar" aria-hidden="true"><span id="bar"></span></div>
-      <div class="loader-meta">
-        <span id="asset">Preparing assets…</span>
-        <span id="hint">Tip: press <b>J</b>/<b>K</b> to switch slides</span>
-      </div>
-    </div>
-  </div>
 
   <!-- Overlays -->
   <div id="transition" aria-hidden="true"></div>
@@ -1342,8 +1311,6 @@ body.nav-open{ overflow:hidden; }
     if (window.innerWidth > 760) setOpen(false);
   }, { passive:true });
 })();
-
-
 
 /* === Mobile menu: close on outside tap (Android-friendly) === */
 (function mobileMenuOutsideClose(){
