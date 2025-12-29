@@ -82,15 +82,6 @@
     }
 
     /* Loader */
-    #loader{
-      position:fixed; inset:0; z-index:9999;
-      display:grid; place-items:center;
-      background:rgba(245,235,221,.92);
-      backdrop-filter: blur(10px) saturate(1.1);
-      border-bottom:1px solid rgba(212,215,225,.9);
-      transition: opacity 420ms var(--ease), visibility 420ms var(--ease);
-    }
-    #loader.is-done{opacity:0; visibility:hidden}
     .loader-card{
       width:min(520px, 90%);
       background:rgba(255,255,255,.55);
@@ -101,15 +92,8 @@
     }
     .loader-top{display:flex; align-items:center; justify-content:space-between; gap:12px}
     .loader-brand{display:flex; align-items:center; gap:10px}
-    .mark{width:40px; height:40px; border-radius:14px; background:var(--primary); box-shadow: inset 0 0 0 2px rgba(255,255,255,.25)}
     .loader-title{font-weight:800; letter-spacing:.02em}
     .loader-sub{color:var(--ink-muted); font-size:.95rem}
-    .bar{
-      height:10px; border-radius:999px; background:rgba(109,99,151,.14); overflow:hidden;
-      border:1px solid rgba(109,99,151,.18);
-      margin-top:14px;
-    }
-    .bar > span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--primary), var(--accent)); border-radius:inherit; transition: width 180ms var(--ease)}
     .loader-meta{display:flex; justify-content:space-between; margin-top:10px; color:var(--ink-muted); font-size:.9rem}
 
     /* Page transition overlay */
@@ -571,7 +555,6 @@ nav { position: relative; }
 /* --- NO ROUNDED CORNERS OVERRIDE --- */
 *, *::before, *::after { border-radius: 0 !important; }
 
-
 /* === EXTRA MOBILE SIZE COMPATIBILITY (all phone sizes) === */
 
 /* Respect safe areas (iOS notch) */
@@ -694,6 +677,45 @@ dialog{
   scroll-margin-top: calc(var(--header-h) + var(--safe-top) + 14px);
 }
 
+
+/* === ANDROID / PIXEL (Chrome) RELIABILITY PATCH === */
+/* Fixes common issues with sticky + backdrop-filter and dropdown positioning on some Android devices. */
+
+html{ overflow-x:hidden; }
+body.nav-open{ overflow:hidden; }
+
+@supports not (height: 1dvh){
+  /* Fallback if dvh isn't supported */
+  dialog{ max-height: 92vh; }
+  .modal{ max-height: 92vh; }
+}
+
+@media (max-width: 859px){
+  /* Some Android builds have click/paint bugs with backdrop-filter on sticky headers */
+  header{ backdrop-filter: none !important; }
+
+  /* Make the menu a real overlay so it never gets clipped */
+  .navList{
+    position: fixed !important;
+    top: calc(var(--header-h) + var(--safe-top));
+    left: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    margin: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    z-index: 9999 !important;
+  }
+
+  /* Ensure the menu button is always clickable above everything */
+  .menuBtn{ position: relative; z-index: 10000; }
+}
+
+/* Improve touch responsiveness */
+@media (pointer: coarse){
+  .menuBtn, .navList a, .btn, .mini, .pillbtn{ min-height: 48px; }
+}
+
 </style>
 </head>
 
@@ -702,12 +724,7 @@ dialog{
   <div class="grain" aria-hidden="true"></div>
 
   <!-- Loader -->
-  <div id="loader" role="status" aria-live="polite" aria-label="Loading">
-    <div class="loader-card">
-      <div class="loader-top">
-        <div class="loader-brand">
-          <div class="mark" aria-hidden="true"></div>
-          <div>
+<div>
             <div class="loader-title">Dongyoung Kim</div>
             <div class="loader-sub">Engineering portfolio</div>
           </div>
@@ -954,61 +971,6 @@ dialog{
     ];
 
     // Loader with real-ish progress
-    (function initLoader(){
-      const loader = $('#loader');
-      const pct = $('#pct');
-      const bar = $('#bar');
-      const asset = $('#asset');
-
-      const urls = new Set([...slides.map(s => s.img), ...projects.map(p => p.img)]);
-      const list = Array.from(urls);
-      const total = list.length || 1;
-      let loaded = 0;
-      let done = false;
-
-      const setProgress = (p) => {
-        const v = clamp(Math.round(p), 0, 100);
-        pct.textContent = v;
-        bar.style.width = v + '%';
-      };
-
-      const tickFake = () => {
-        if (done) return;
-        const v = parseInt(pct.textContent || '0', 10);
-        if (v < 90) setProgress(v + 1);
-        requestAnimationFrame(() => setTimeout(tickFake, 45));
-      };
-
-      const finish = () => {
-        done = true;
-        setProgress(100);
-        asset.textContent = 'Ready';
-        setTimeout(() => loader.classList.add('is-done'), 180);
-      };
-
-      tickFake();
-
-      if (prefersReduced){
-        window.addEventListener('load', finish, { once:true });
-        return;
-      }
-
-      asset.textContent = `Loading ${total} images…`;
-
-      list.forEach((u) => {
-        const img = new Image();
-        img.onload = img.onerror = () => {
-          loaded += 1;
-          setProgress((loaded / total) * 100);
-          asset.textContent = `Loading ${loaded}/${total} images…`;
-          if (loaded >= total) finish();
-        };
-        img.src = u;
-      });
-
-      window.addEventListener('load', () => setTimeout(finish, 100), { once:true });
-    })();
-
     // Backdrop parallax
     (function initBackdrop(){
       if (prefersReduced || isCoarsePointer) return;
@@ -1378,6 +1340,26 @@ dialog{
   // If resized up, ensure menu is closed
   window.addEventListener('resize', () => {
     if (window.innerWidth > 760) setOpen(false);
+  }, { passive:true });
+})();
+
+
+
+/* === Mobile menu: close on outside tap (Android-friendly) === */
+(function mobileMenuOutsideClose(){
+  const btn = document.getElementById('menuBtn');
+  const list = document.getElementById('navLinks');
+  if (!btn || !list) return;
+
+  document.addEventListener('click', (e) => {
+    if (!document.body.classList.contains('nav-open')) return;
+    const insideNav = e.target.closest('#navLinks');
+    const insideBtn = e.target.closest('#menuBtn');
+    if (!insideNav && !insideBtn) {
+      document.body.classList.remove('nav-open');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-label', 'Open menu');
+    }
   }, { passive:true });
 })();
 
