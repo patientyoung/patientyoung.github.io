@@ -405,10 +405,10 @@
           <h2 style="margin-top:12px">Approach</h2>
           
           <ol>
-            <li><b>Mechanical integration:</b> Installed BMG dual‑gear extruder, high‑flow hotend, BLTouch probing, and ADXL345 accelerometer; designed custom toolhead mounts/ducts using parametric CAD to optimize mass, airflow, and rigidity.</li>
-            <li><b>Firmware + motion control:</b> Migrated to Klipper on a Raspberry Pi Zero 2 W; ran accelerometer‑based resonance testing and applied input shaping; tuned acceleration, pressure advance, and related motion parameters for stability.</li>
-            <li><b>Electrical reliability:</b> Built custom JST‑XH wiring harnesses and improved cable routing; diagnosed thermistor faults, firmware issues, and power‑related failures; validated safety and signal integrity with multimeter diagnostics.</li>
-            <li><b>Testing + optimization:</b> Iterated with calibration geometry and real parts; compared slicer configs and volumetric flow limits to find bottlenecks; logged config changes for reproducibility/version control.</li>
+            <li><b>Mechanical integration:</b> Installed BMG dual‑gear extruder, Volcano high‑flow hotend, BLTouch probing, and ADXL345 accelerometer; Used custom toolhead mounts/ducts using parametric CAD to model and predict compatibity with printer; Upgraded to dual Z-axis to increase stability for higher prints; Replaced standard bed plate for spring steel plate for better adhesion and ease of use; </li>
+            <li><b>Firmware & motion control:</b> Migrated to Klipper on a Raspberry Pi Zero 2W; ran accelerometer‑based resonance testing and applied input shaping; tuned acceleration, pressure advance, and related motion parameters for stability and speed.</li>
+            <li><b>Electrical reliability:</b> Built custom JST‑XH wiring and improved cable routing; diagnosed thermistor faults, firmware issues, and power‑related failures; validated safety and signal integrity with multimeter diagnostics.</li>
+            <li><b>Testing & optimization:</b> Iterated with calibration geometry and real parts; compared slicer configs and volumetric flow limits to find bottlenecks; logged config changes for reproducibility/version control using benchmark prints (3DBenchy).</li>
           </ol>
 
         </article>
@@ -417,15 +417,13 @@
           <h2>Results & impact</h2>
 
           <ul>
-            <li><b>Maximum stable speed</b>: <b>[old speed]</b> → <b>[new speed]</b> mm/s (<b>[percent improvement]%</b> increase)</li>
-            <li><b>Average print time</b>: ↓ <b>[print time reduction %]%</b></li>
-            <li><b>Dimensional accuracy</b>: <b>±[tolerance mm] mm</b></li>
-            <li><b>Print success rate</b>: ↑ to <b>[success rate %]%</b></li>
-            <li><b>Benchmarking</b>: matched/exceeded commercial printers costing <b>[cost comparison] CAD</b></li>
+            <li><b>Maximum stable speed</b>: <b>55mm/s</b> → <b>200mm/s</b> (<b>263%</b> increase)</li>
+            <li><b>Average print time</b>: <b>1.5 hours</b> → <b>20 minutes</b> (<b>78%</b> decrease)</li>
+            <li><b>Benchmarking</b>: matched commercial printers costing <b>[cost comparison] CAD</b></li>
           </ul>
 
 
-          <h2 style="margin-top:12px">Evidence</h2>
+          <h2 style="margin-top:12px">Photos</h2>
           <p class="muted">Photos and tuning artifacts (Klipper configs, input‑shaping plots, calibration prints) make this project easy to verify. Link a short demo clip and your configuration repo if you want recruiters to see proof fast.</p>
 
           <div class="grid" style="grid-template-columns:repeat(2,1fr); gap:.8rem">
