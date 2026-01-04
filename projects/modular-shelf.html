@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Modular Shelf System — Dongyoung Kim</title>
+  <meta name="description" content="Designed and validated a modular, load‑bearing shelf system using 3D‑printed press‑fit connectors and standardized dowel supports." />
+  <meta name="color-scheme" content="light" />
+
+  <!--
+    Drop this file into: /projects/project-slug.html
+    Then update image paths to: ../assets/img/...
+    And resume path to: ../assets/docs/...
+  -->
+
+  <style>
+    /* === THEME: aligned to your main page (palette, backdrop, typography, buttons, panels, cards) === */
+    :root{
+      --bg:#F2E2E6;        /* canvas */
+      --surface:#E3D6E8;   /* lavender panels */
+      --surface-2:#D7C3E2; /* sky panels */
+      --blush:#CCA2B2;     /* accent */
+      --mint:#B496C5;      /* success */
+      --primary:#6D6397;   /* brand indigo */
+      --primary-2:#4E3A63; /* hover */
+      --accent:#A98AAB;    /* raspberry */
+      --ink:#1E1522;       /* body */
+      --ink-muted:#4A3B52; /* captions */
+      --line:#D8C8D6;      /* hairlines */
+      --tag:#0F766E;       /* chips */
+      --radius:0px;
+      --shadow:0 10px 26px rgba(31,41,55,.10), 0 2px 6px rgba(31,41,55,.06);
+      --shadow-soft:0 8px 22px rgba(31,41,55,.08);
+      --ease:cubic-bezier(.2,.8,.2,1);
+      --header-h:72px;
+
+      /* mobile safe-area helpers */
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --gutter: clamp(14px, 4vw, 24px);
+    }
+
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      overflow-x:hidden;
+    }
+    a{color:var(--primary); text-decoration:none}
+    a:hover{color:var(--primary-2)}
+    img{max-width:100%; display:block}
+    .container{width:min(1120px, calc(100% - (var(--gutter) * 2))); margin-inline:auto}
+
+    /* Backdrop + grain (same vibe) */
+    .backdrop{
+      position:fixed; inset:0; pointer-events:none; z-index:-2;
+      background:
+        radial-gradient(900px 520px at 18% 12%, rgba(215,195,226,.60), transparent 60%),
+        radial-gradient(820px 520px at 78% 16%, rgba(204,162,178,.52), transparent 62%),
+        radial-gradient(980px 620px at 52% 86%, rgba(169,138,171,.45), transparent 66%),
+        linear-gradient(180deg, rgba(242,226,230,1), rgba(242,226,230,.90));
+      transform: translate3d(var(--bgx,0px), var(--bgy,0px), 0);
+      transition: transform 120ms linear;
+      will-change: transform;
+    }
+    .grain{
+      position:fixed; inset:-40%; pointer-events:none; z-index:-1;
+      opacity:.16; mix-blend-mode:multiply;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="180" height="180" filter="url(%23n)" opacity=".65"/></svg>');
+      animation: grain 9s steps(8) infinite;
+    }
+    @keyframes grain{
+      0%{transform:translate3d(0,0,0)}
+      10%{transform:translate3d(-5%, -8%, 0)}
+      20%{transform:translate3d(-10%, 5%, 0)}
+      30%{transform:translate3d(7%, -10%, 0)}
+      40%{transform:translate3d(-5%, 12%, 0)}
+      50%{transform:translate3d(-12%, -5%, 0)}
+      60%{transform:translate3d(10%, 8%, 0)}
+      70%{transform:translate3d(4%, 14%, 0)}
+      80%{transform:translate3d(12%, 4%, 0)}
+      90%{transform:translate3d(-6%, 10%, 0)}
+      100%{transform:translate3d(0,0,0)}
+    }
+
+    :focus-visible{outline:3px solid rgba(109,99,151,.55); outline-offset:3px}
+
+    /* Page transition overlay */
+    #transition{
+      position:fixed; inset:0; z-index:9980; pointer-events:none;
+      background:rgba(47,61,107,.12);
+      opacity:0;
+      transition: opacity 260ms var(--ease);
+      backdrop-filter: blur(8px) saturate(1.1);
+    }
+    #transition.on{opacity:1}
+
+    /* Header (same) */
+    header{
+      position:sticky; top:0; z-index:50;
+      padding-top: var(--safe-top);
+      height: calc(var(--header-h) + var(--safe-top));
+      background:linear-gradient(180deg, rgba(245,235,221,.92), rgba(245,235,221,.76));
+      backdrop-filter:saturate(1.2) blur(10px);
+      border-bottom:1px solid rgba(212,215,225,.9);
+    }
+    .nav{
+      height: calc(var(--header-h) + var(--safe-top));
+      display:flex; align-items:center; justify-content:space-between;
+      gap:1rem;
+      padding-left: var(--safe-left);
+      padding-right: var(--safe-right);
+    }
+    .brand{display:flex; align-items:center; gap:.75rem; font-weight:850}
+    .brand-mark{width:36px; height:36px; background:var(--primary); box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+    nav{position:relative}
+    nav ul{display:flex; gap:.4rem; list-style:none; margin:0; padding:0; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+    nav a{
+      display:inline-flex; align-items:center;
+      padding:.5rem .8rem;
+      position:relative;
+      color:var(--ink);
+      transition: background 160ms var(--ease), color 160ms var(--ease);
+    }
+    nav a:hover{background:rgba(109,99,151,.10)}
+    nav a.cta{background:var(--primary); color:#fff; box-shadow:var(--shadow-soft)}
+    nav a.cta:hover{background:var(--primary-2); color:#fff}
+
+    /* Mobile menu button */
+    .menuBtn{
+      display:none;
+      align-items:center;
+      gap:.55rem;
+      padding:.55rem .75rem;
+      border:1px solid rgba(109,99,151,.22);
+      background: rgba(255,255,255,.35);
+      font: inherit;
+      font-weight: 900;
+      color: var(--ink);
+      box-shadow: var(--shadow-soft);
+    }
+    .menuIcon{ width: 18px; height: 14px; display:inline-block; position:relative; }
+    .menuIcon::before, .menuIcon::after, .menuIcon span{
+      content:""; position:absolute; left:0; right:0; height:2px; background: var(--ink);
+    }
+    .menuIcon::before{ top:0; }
+    .menuIcon::after{ bottom:0; }
+    .menuIcon span{ top:6px; }
+
+    /* Buttons */
+    .btn{
+      display:inline-flex; align-items:center; gap:.5rem;
+      padding:.78rem 1.05rem;
+      border:1px solid rgba(109,99,151,.22);
+      box-shadow:var(--shadow-soft);
+      transition: transform 160ms var(--ease), background 160ms var(--ease), color 160ms var(--ease);
+      background:rgba(255,255,255,.35);
+      user-select:none;
+      will-change: transform;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:var(--primary); color:#fff; border-color:transparent}
+    .btn.primary:hover{background:var(--primary-2)}
+    .btn.ghost{background:rgba(255,255,255,.35); color:var(--primary)}
+    .btn.ghost:hover{background:rgba(109,99,151,.10)}
+    .btn.small{padding:.55rem .8rem; font-weight:850}
+
+    /* Sections */
+    main{ padding-left: var(--safe-left); padding-right: var(--safe-right); }
+    section{padding:34px 0}
+    .kicker{font-weight:800; letter-spacing:.10em; text-transform:uppercase; color:var(--ink-muted); font-size:.86rem}
+    h1{
+      font-size:clamp(28px, 5.1vw, 52px);
+      line-height:1.07;
+      margin:.5rem 0 .6rem;
+      letter-spacing:-.02em;
+    }
+    h2{margin:.2rem 0 .6rem; letter-spacing:-.01em}
+    .lead{color:var(--ink-muted); max-width:72ch; margin:0}
+    .muted{color:var(--ink-muted)}
+    .actions{display:flex; gap:.8rem; flex-wrap:wrap; margin-top:1.1rem}
+
+    /* Cards / panels */
+    .card{
+      position:relative;
+      background:rgba(214,205,234,.75);
+      border:1px solid rgba(212,215,225,.9);
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    .panel{
+      background:rgba(245,235,221,.55);
+      border:1px solid rgba(212,215,225,.9);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+    .grid{display:grid; gap:1.2rem}
+    @media (min-width: 900px){ .grid.cols-2{grid-template-columns: 1.15fr .85fr;} }
+
+    .hero-stage{
+      position:relative;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(212,215,225,.9);
+      background:linear-gradient(135deg, rgba(214,205,234,.55), rgba(191,215,234,.35));
+      aspect-ratio: 16 / 11;
+      min-height: clamp(220px, 38vw, 380px);
+    }
+    .hero-stage img{height:100%; width:100%; object-fit:cover}
+    .stage-overlay{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(900px 420px at 30% 20%, rgba(245,235,221,.45), transparent 55%),
+        linear-gradient(180deg, rgba(31,41,55,0), rgba(31,41,55,.25));
+      pointer-events:none;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:.35rem .65rem;
+      border-radius:999px;
+      background:rgba(245,235,221,.75);
+      border:1px solid rgba(212,215,225,.85);
+      box-shadow:0 8px 18px rgba(31,41,55,.10);
+      font-weight:750;
+      color:var(--ink);
+      font-size:.9rem;
+    }
+    .badge i{display:inline-block; width:8px; height:8px; border-radius:99px; background:linear-gradient(90deg, var(--primary), var(--accent))}
+
+    .chips{display:flex; gap:.45rem; flex-wrap:wrap}
+    .chip{background:rgba(58,75,135,.92); color:#fff; border-radius:999px; padding:.15rem .55rem; font-size:.78rem; font-weight:800}
+
+    .kv{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin: 12px 0}
+    @media (max-width: 760px){ .kv{grid-template-columns:1fr;} }
+    .kv .k{background:rgba(255,255,255,.45); border:1px solid rgba(109,99,151,.18); border-radius:16px; padding:10px}
+    .kv .k b{display:block; font-size:.85rem; color:var(--ink-muted); margin-bottom:3px}
+    .kv .k span{font-weight:850}
+
+    /* Footer */
+    footer{padding:28px 0 52px; color:var(--ink-muted); border-top:1px solid rgba(212,215,225,.9)}
+
+    /* Reveal */
+    [data-reveal]{opacity:0; transform: translateY(12px); transition: opacity 420ms var(--ease), transform 420ms var(--ease)}
+    [data-reveal].show{opacity:1; transform:none}
+    [data-reveal="fade"]{transform:none}
+
+    /* Mobile dropdown */
+    @media (max-width: 760px){
+      :root{ --header-h: 64px; }
+      .menuBtn{ display:inline-flex; }
+      nav ul{
+        display:none !important;
+        position:fixed;
+        top: calc(var(--header-h) + var(--safe-top));
+        left: 0; right: 0;
+        margin: 0;
+        padding: 10px;
+        background: rgba(245,235,221,.96);
+        backdrop-filter: blur(12px) saturate(1.1);
+        border-top: 1px solid rgba(212,215,225,.9);
+        border-bottom: 1px solid rgba(212,215,225,.9);
+        box-shadow: var(--shadow);
+        z-index: 9999;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        max-height: min(70dvh, 520px);
+        overflow:auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: calc(10px + var(--safe-bottom));
+      }
+      nav ul li { width:100%; }
+      nav a, nav a.cta{ width:100%; justify-content: space-between; }
+      body.nav-open nav ul{ display:flex !important; }
+    }
+
+    /* Pixel/Android: avoid sticky+backdrop tap weirdness */
+    @media (max-width: 859px){ header{ backdrop-filter:none !important; } }
+
+    /* remove all rounded edges (matches your preference) */
+    *, *::before, *::after { border-radius: 0 !important; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *, *::before, *::after{animation:none !important; transition:none !important}
+      .grain{display:none}
+      [data-reveal]{opacity:1 !important; transform:none !important}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="backdrop" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div id="transition" aria-hidden="true"></div>
+
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <span>Dongyoung Kim</span>
+      </div>
+
+      <nav aria-label="Primary">
+        <button class="menuBtn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+          <span class="menuIcon" aria-hidden="true"></span>
+          <span class="menuText">Menu</span>
+        </button>
+
+        <ul id="navLinks">
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+          <li><a class="cta" href="../assets/docs/[your_resume_filename].pdf" download>Download Resume</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Top (hero-like) -->
+    <section>
+      <div class="container grid cols-2">
+        <div data-reveal>
+          <div class="kicker">Portfolio Item</div>
+          <h1>Modular Load‑Bearing Shelf System (Press‑Fit 3D‑Printed Connectors)</h1>
+          <p class="lead">Designed a modular shelf system using 3D‑printed press‑fit connectors and 3/8″ birch dowel supports—validated with mechanics calculations and testing to rate each unit at <b>104 kg</b> total load with a <b>2× safety factor</b>.</p>
+
+          <div class="actions">
+            <a class="btn primary" href="../index.html#projects">↳ Back to projects</a>
+            <a class="btn ghost" href="../assets/docs/[your_resume_filename].pdf" download>Resume</a>
+          </div>
+
+          
+          <div class="chips" style="margin-top:14px">
+            <span class="chip">Euler Buckling</span>
+            <span class="chip">Deflection</span>
+            <span class="chip">DFM</span>
+            <span class="chip">Parametric CAD</span>
+            <span class="chip">Cost Optimization</span>
+            <span class="chip">Validation</span>
+          </div>
+
+        </div>
+
+        <div class="card hero-stage" data-reveal aria-label="Project hero media">
+          <img src="../assets/img/shelf.jpg" alt="Modular shelf system" loading="eager" />
+          <div class="stage-overlay" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick facts -->
+    <section>
+      <div class="container panel" data-reveal>
+        <div class="badge"><i aria-hidden="true"></i><span>Overview</span></div>
+
+        <div class="kv">
+          <div class="k"><b>Role</b><span>Mechanical designer / analyst</span></div>
+          <div class="k"><b>Timeline</b><span>[timeline]</span></div>
+          <div class="k"><b>Tools</b><span>Parametric CAD, 3D printing, mechanics calcs, test loads</span></div>
+          <div class="k"><b>Result</b><span>104 kg per unit (SF=2)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Case study -->
+    <section>
+      <div class="container grid cols-2">
+        <article class="panel" data-reveal>
+          
+          <h2>Project overview</h2>
+          <p class="muted">
+            Designed and validated a modular, load‑bearing shelf system using 3D‑printed press‑fit connectors and standardized dowel supports.
+            Focus: maximize strength‑to‑cost efficiency, minimize assembly complexity, and prove performance with analytical mechanics + physical testing.
+          </p>
+
+          <h2 style="margin-top:12px">Engineering objectives</h2>
+          <ul>
+            <li>Achieve high load capacity using low‑cost, readily available materials.</li>
+            <li>Minimize part count and assembly time through press‑fit, tool‑less joints.</li>
+            <li>Validate structural performance using mechanics (buckling + deflection).</li>
+            <li>Enable modularity and scalability via parametric connector geometry.</li>
+          </ul>
+
+
+          <h2 style="margin-top:12px">Constraints</h2>
+          
+          <ul>
+            <li>Use standardized dowels (3/8″ birch) and printable connectors—no specialty hardware.</li>
+            <li>Tool‑less press‑fit assembly (fasteners minimized/removed).</li>
+            <li>Safety factor: <b>2×</b> on the rated load.</li>
+            <li>Design must be modular and scalable across shelf sizes.</li>
+            <li>Target: high strength‑to‑cost with simple BOM.</li>
+          </ul>
+
+
+          <h2 style="margin-top:12px">Approach</h2>
+          
+          <ol>
+            <li><b>Structural design:</b> Created a four‑column load path using 3/8″ birch dowels as vertical supports; modeled critical members and load cases.</li>
+            <li><b>Analysis:</b> Evaluated column stability using <b>Euler buckling</b> to estimate critical load; applied <b>deflection</b> checks to validate stiffness assumptions.</li>
+            <li><b>Materials selection:</b> Compared 2×4 lumber, ½″ steel rods, and 3/8″ birch dowels; selected birch for stiffness‑to‑cost, weight, and availability.</li>
+            <li><b>Connector engineering:</b> Designed press‑fit 3D‑printed connectors; iterated <b>11 revisions</b> to refine tolerances and joint geometry and reduce reprints/waste.</li>
+            <li><b>Cost + assembly optimization:</b> Standardized components to simplify the BOM and reduced assembly time via tool‑less joints; achieved <b>$5.82</b> cost per connector.</li>
+            <li><b>Validation:</b> Measured mid‑span deflection under test loads and cross‑checked against calculations to confirm performance.</li>
+          </ol>
+
+        </article>
+
+        <aside class="panel" data-reveal style="transition-delay:90ms">
+          <h2>Key results</h2>
+
+          <ul>
+            <li><b>Load capacity</b>: <b>104 kg</b> per shelf unit @ <b>2×</b> safety factor</li>
+            <li><b>Part/assembly efficiency</b>: tool‑less press‑fit assembly; minimized part count and build time per unit</li>
+            <li><b>Cost</b>: <b>$5.82</b> per connector; standardized components reduced BOM complexity</li>
+            <li><b>Design maturity</b>: parametric, scalable geometry adaptable to multiple shelf sizes</li>
+            <li><b>Validation</b>: deflection measurements used to confirm stiffness assumptions</li>
+          </ul>
+
+
+          <h2 style="margin-top:12px">Evidence</h2>
+          <p class="muted">Include a photo of the assembled shelf, a close‑up of a connector joint, and (optional) a screenshot of your buckling/deflection worksheet. A quick clip of loading/unloading the shelf is great proof.</p>
+
+          <div class="grid" style="grid-template-columns:repeat(2,1fr); gap:.8rem">
+            <div class="card"><img src="../assets/img/shelf.jpg" alt="Shelf under load test" loading="lazy" /></div>
+            <div class="card"><img src="../assets/img/[connector_closeup].jpg" alt="Press-fit connector closeup" loading="lazy" /></div>
+          </div>
+
+          <div class="actions" style="margin-top:14px">
+            <a class="btn small ghost" href="[github_or_files_url]" target="_blank" rel="noopener noreferrer">GitHub / Files</a>
+            <a class="btn small ghost" href="[demo_video_url]" target="_blank" rel="noopener noreferrer">Demo video</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Next steps -->
+    <section>
+      <div class="container panel" data-reveal>
+        <h2>Next improvements</h2>
+        
+        <ul>
+          <li>Characterize the connector joint: pull‑out strength and creep over time for common filaments (PLA/PETG/ABS).</li>
+          <li>Add a simple “design table” so you can generate connector variants for new dowel diameters and shelf spans.</li>
+          <li>Publish the analysis worksheet + test protocol so the load rating is easy to audit and reproduce.</li>
+        </ul>
+
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <small>© <span id="year"></span> Dongyoung Kim.</small>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+
+    // Backdrop parallax (safe on desktop only)
+    (function initBackdrop(){
+      if (prefersReduced || isCoarsePointer) return;
+      const bg = document.querySelector('.backdrop');
+      let tx = 0, ty = 0, x = 0, y = 0;
+
+      window.addEventListener('mousemove', (e) => {
+        const px = (e.clientX / window.innerWidth) - 0.5;
+        const py = (e.clientY / window.innerHeight) - 0.5;
+        tx = px * -14;
+        ty = py * -10;
+      }, { passive:true });
+
+      const raf = () => {
+        x += (tx - x) * 0.08;
+        y += (ty - y) * 0.08;
+        bg.style.setProperty('--bgx', x.toFixed(2) + 'px');
+        bg.style.setProperty('--bgy', y.toFixed(2) + 'px');
+        requestAnimationFrame(raf);
+      };
+      requestAnimationFrame(raf);
+    })();
+
+    // Reveal on scroll
+    (function initReveal(){
+      const els = Array.from(document.querySelectorAll('[data-reveal]'));
+      if (prefersReduced){ els.forEach(el => el.classList.add('show')); return; }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+      }, { threshold: 0.15 });
+      els.forEach(el => io.observe(el));
+    })();
+
+    // Mobile menu toggle
+    (function initMobileMenu(){
+      const btn = document.getElementById('menuBtn');
+      const list = document.getElementById('navLinks');
+      if (!btn || !list) return;
+
+      const setOpen = (open) => {
+        document.body.classList.toggle('nav-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      };
+
+      btn.addEventListener('click', () => setOpen(!document.body.classList.contains('nav-open')));
+      list.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+
+      // Close on outside tap (Pixel-friendly)
+      document.addEventListener('click', (e) => {
+        if (!document.body.classList.contains('nav-open')) return;
+        const insideNav = e.target.closest('#navLinks');
+        const insideBtn = e.target.closest('#menuBtn');
+        if (!insideNav && !insideBtn) setOpen(false);
+      }, { passive:true });
+
+      window.addEventListener('resize', () => { if (window.innerWidth > 760) setOpen(false); }, { passive:true });
+    })();
+
+    // Page transition for internal navigation (same-origin only)
+    (function initNavTransitions(){
+      const overlay = document.getElementById('transition');
+      const isSameOriginLink = (a) => {
+        if (!a) return false;
+        const href = a.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return false;
+        if (a.hasAttribute('download')) return false;
+        try{ return new URL(href, window.location.href).origin === window.location.origin; }
+        catch{ return false; }
+      };
+
+      document.addEventListener('click', (e) => {
+        const a = e.target.closest('a');
+        if (!isSameOriginLink(a)) return;
+        e.preventDefault();
+
+        const href = a.getAttribute('href');
+        overlay.classList.add('on');
+
+        const go = () => { window.location.href = href; };
+        if (prefersReduced) return go();
+        setTimeout(go, 180);
+      });
+
+      window.addEventListener('pageshow', () => overlay.classList.remove('on'));
+    })();
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
