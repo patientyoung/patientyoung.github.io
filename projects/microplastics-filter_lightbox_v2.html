@@ -292,7 +292,86 @@
       .grain{display:none}
       [data-reveal]{opacity:1 !important; transform:none !important}
     }
-  </style>
+  
+    /* === Image lightbox (click-to-enlarge) === */
+    img.zoomable{
+      cursor: zoom-in;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .imgModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+      background: rgba(18, 16, 22, .72);
+      z-index: 100000;
+    }
+    .imgModal.open{ display:flex; }
+    .imgModal__panel{
+      width: min(1100px, 96vw);
+      preventing: none;
+      max-height: 88dvh;
+      background: rgba(245,235,221,.92);
+      border: 1px solid rgba(212,215,225,.9);
+      box-shadow: 0 10px 26px rgba(31,41,55,.10), 0 2px 6px rgba(31,41,55,.06);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .imgModal__top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(212,215,225,.9);
+      background: rgba(245,235,221,.92);
+    }
+    .imgModal__title{
+      font-weight: 900;
+      color: #1E1522;
+      font-size: .95rem;
+      line-height: 1.2;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .imgModal__close{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 38px;
+      height: 38px;
+      border:1px solid rgba(109,99,151,.22);
+      background: rgba(255,255,255,.35);
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .imgModal__close:hover{ background: rgba(109,99,151,.10); }
+    .imgModal__close:active{ transform: translateY(1px); }
+    .imgModal__body{
+      padding: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(214,205,234,.55);
+    }
+    .imgModal__img{
+      width: 100%;
+      height: auto;
+      max-height: calc(88dvh - 86px);
+      object-fit: contain;
+      display:block;
+      cursor: zoom-out;
+    }
+    /* square edges */
+    .imgModal, .imgModal__panel, .imgModal__close { border-radius: 0 !important; }
+
+</style>
 </head>
 
 <body>
@@ -548,5 +627,105 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
+
+  <!-- Image Lightbox Modal -->
+  <div class="imgModal" id="imgModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="imgModal__panel" role="document">
+      <div class="imgModal__top">
+        <div class="imgModal__title" id="imgModalTitle">Preview</div>
+        <button class="imgModal__close" id="imgModalClose" type="button" aria-label="Close image">✕</button>
+      </div>
+      <div class="imgModal__body">
+        <img class="imgModal__img" id="imgModalImg" alt="" />
+      </div>
+    </div>
+  </div>
+
+
+<script>
+/* Click-to-enlarge (lightbox) - robust version */
+(function(){
+  const modal = document.getElementById('imgModal');
+  const modalImg = document.getElementById('imgModalImg');
+  const modalTitle = document.getElementById('imgModalTitle');
+  const closeBtn = document.getElementById('imgModalClose');
+  const main = document.querySelector('main');
+
+  if (!modal || !modalImg || !closeBtn || !main) return;
+
+  let lastActive = null;
+
+  function openLightbox(imgEl){
+    const full = imgEl.getAttribute('data-full') || imgEl.currentSrc || imgEl.src;
+    const alt = (imgEl.getAttribute('alt') || '').trim();
+    lastActive = document.activeElement;
+
+    modalImg.src = full;
+    modalImg.alt = alt || 'Preview image';
+    modalTitle.textContent = alt || 'Preview';
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+
+    // lock scroll
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    closeBtn.focus({ preventScroll: true });
+  }
+
+  function closeLightbox(){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+
+    modalImg.src = '';
+
+    if (lastActive && typeof lastActive.focus === 'function') {
+      lastActive.focus({ preventScroll: true });
+    }
+  }
+
+  // Mark images inside main as zoomable
+  function mark(){
+    main.querySelectorAll('img').forEach(img => {
+      // Skip tiny icons/logos if you have any in main
+      img.classList.add('zoomable');
+      if (!img.hasAttribute('tabindex')) img.setAttribute('tabindex','0');
+      if (!img.hasAttribute('role')) img.setAttribute('role','button');
+      img.setAttribute('aria-label', (img.getAttribute('alt') || 'Open image') + ' (click to enlarge)');
+    });
+  }
+  mark();
+
+  // Click handler (event delegation)
+  document.addEventListener('click', (e) => {
+    const img = e.target.closest('main img.zoomable');
+    if (!img) return;
+    openLightbox(img);
+  });
+
+  // Keyboard handler
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) {
+      e.preventDefault();
+      closeLightbox();
+      return;
+    }
+    const focused = document.activeElement;
+    if ((e.key === 'Enter' || e.key === ' ') && focused && focused.matches && focused.matches('main img.zoomable')) {
+      e.preventDefault();
+      openLightbox(focused);
+    }
+  });
+
+  closeBtn.addEventListener('click', closeLightbox);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeLightbox(); });
+  modalImg.addEventListener('click', closeLightbox);
+})();
+</script>
+
 </body>
 </html>

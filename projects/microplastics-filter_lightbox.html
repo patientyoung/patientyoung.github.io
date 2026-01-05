@@ -292,6 +292,93 @@
       .grain{display:none}
       [data-reveal]{opacity:1 !important; transform:none !important}
     }
+  
+    /* === Image lightbox (click-to-enlarge) === */
+    img.zoomable{
+      cursor: zoom-in;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .imgModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: max(16px, var(--safe-top)) max(16px, var(--safe-right)) max(16px, var(--safe-bottom)) max(16px, var(--safe-left));
+      background: rgba(18, 16, 22, .72);
+      z-index: 100000;
+    }
+    .imgModal.open{ display:flex; }
+
+    .imgModal__panel{
+      width: min(1100px, 96vw);
+      max-height: 88dvh;
+      background: rgba(245,235,221,.92);
+      border: 1px solid rgba(212,215,225,.9);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .imgModal__top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(212,215,225,.9);
+      background: rgba(245,235,221,.92);
+    }
+
+    .imgModal__title{
+      font-weight: 900;
+      color: var(--ink);
+      font-size: .95rem;
+      line-height: 1.2;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .imgModal__close{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 38px;
+      height: 38px;
+      border:1px solid rgba(109,99,151,.22);
+      background: rgba(255,255,255,.35);
+      box-shadow: var(--shadow-soft);
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .imgModal__close:hover{ background: rgba(109,99,151,.10); }
+    .imgModal__close:active{ transform: translateY(1px); }
+
+    .imgModal__body{
+      padding: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(214,205,234,.55);
+    }
+
+    .imgModal__img{
+      width: 100%;
+      height: auto;
+      max-height: calc(88dvh - 86px);
+      object-fit: contain;
+      display:block;
+      cursor: zoom-out;
+    }
+
+    /* keep square corners consistent with your "no rounded edges" preference */
+    .imgModal, .imgModal__panel, .imgModal__close { border-radius: 0 !important; }
+
   </style>
 </head>
 
@@ -547,6 +634,112 @@
     })();
 
     document.getElementById('year').textContent = new Date().getFullYear();
+  
+
+    // Click-to-enlarge images (lightbox)
+    (function initImageLightbox(){
+      const modal = document.getElementById('imgModal');
+      const modalImg = document.getElementById('imgModalImg');
+      const modalTitle = document.getElementById('imgModalTitle');
+      const closeBtn = document.getElementById('imgModalClose');
+      if (!modal || !modalImg || !closeBtn) return;
+
+      let lastActive = null;
+
+      const open = (imgEl) => {
+        const full = imgEl.getAttribute('data-full') || imgEl.currentSrc || imgEl.src;
+        const alt = (imgEl.getAttribute('alt') || '').trim();
+        lastActive = document.activeElement;
+
+        modalImg.src = full;
+        modalImg.alt = alt || 'Preview image';
+        modalTitle.textContent = alt || 'Preview';
+
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+
+        // lock background scroll
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+
+        // focus for accessibility
+        closeBtn.focus({ preventScroll: true });
+      };
+
+      const close = () => {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+
+        // unlock scroll
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+
+        // stop loading if user closes fast
+        modalImg.src = '';
+
+        if (lastActive && typeof lastActive.focus === 'function') {
+          lastActive.focus({ preventScroll: true });
+        }
+      };
+
+      // Mark images as zoomable and make them keyboard accessible
+      const markZoomable = () => {
+        document.querySelectorAll('main .card img').forEach(img => {
+          img.classList.add('zoomable');
+          if (!img.hasAttribute('tabindex')) img.setAttribute('tabindex','0');
+          if (!img.hasAttribute('role')) img.setAttribute('role','button');
+          img.setAttribute('aria-label', (img.getAttribute('alt') || 'Open image') + ' (click to enlarge)');
+        });
+      };
+      markZoomable();
+
+      // If content changes later, you can call markZoomable() again (not needed now).
+
+      // Click / keyboard open
+      document.addEventListener('click', (e) => {
+        const img = e.target.closest('main .card img.zoomable');
+        if (!img) return;
+        open(img);
+      });
+
+      document.addEventListener('keydown', (e) => {
+        // open from focused image (Enter/Space)
+        const focused = document.activeElement;
+        if ((e.key === 'Enter' || e.key === ' ') && focused && focused.matches && focused.matches('main .card img.zoomable')) {
+          e.preventDefault();
+          open(focused);
+          return;
+        }
+        // close with Escape
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+          e.preventDefault();
+          close();
+        }
+      });
+
+      // Close controls
+      closeBtn.addEventListener('click', close);
+      modal.addEventListener('click', (e) => {
+        // click outside panel closes
+        if (e.target === modal) close();
+      });
+      modalImg.addEventListener('click', close); // click image to close (nice UX)
+    })();
+
   </script>
+
+  <!-- Image Lightbox Modal -->
+  <div class="imgModal" id="imgModal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Image preview">
+    <div class="imgModal__panel" role="document">
+      <div class="imgModal__top">
+        <div class="imgModal__title" id="imgModalTitle">Preview</div>
+        <button class="imgModal__close" id="imgModalClose" type="button" aria-label="Close image">✕</button>
+      </div>
+      <div class="imgModal__body">
+        <img class="imgModal__img" id="imgModalImg" alt="" />
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

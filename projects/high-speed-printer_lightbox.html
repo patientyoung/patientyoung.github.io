@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Microplastic Filtration System for Wastewater Treatment — Dongyoung Kim</title>
-  <meta name="description" content="Designed a concept microplastic filter for wastewater treatment using porous high‑carbon steel; sized pore architecture, verified strength under porosity, and quantified lifecycle impact via Eco‑Audit/LCA." />
+  <title>High‑Speed 3D Printer Integration — Dongyoung Kim</title>
+  <meta name="description" content="Converted a stock Ender‑3 Pro into a high‑speed, high‑precision rapid‑prototyping system through mechanical, electrical, and firmware redesign." />
   <meta name="color-scheme" content="light" />
 
   <!--
@@ -292,6 +292,85 @@
       .grain{display:none}
       [data-reveal]{opacity:1 !important; transform:none !important}
     }
+  
+    /* === Image lightbox (click-to-enlarge) === */
+    img.zoomable{
+      cursor: zoom-in;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .imgModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+      background: rgba(18, 16, 22, .72);
+      z-index: 100000;
+    }
+    .imgModal.open{ display:flex; }
+    .imgModal__panel{
+      width: min(1100px, 96vw);
+      max-height: 88dvh;
+      background: rgba(245,235,221,.92);
+      border: 1px solid rgba(212,215,225,.9);
+      box-shadow: 0 10px 26px rgba(31,41,55,.10), 0 2px 6px rgba(31,41,55,.06);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .imgModal__top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(212,215,225,.9);
+      background: rgba(245,235,221,.92);
+    }
+    .imgModal__title{
+      font-weight: 900;
+      color: var(--ink);
+      font-size: .95rem;
+      line-height: 1.2;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .imgModal__close{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 38px;
+      height: 38px;
+      border:1px solid rgba(109,99,151,.22);
+      background: rgba(255,255,255,.35);
+      box-shadow: var(--shadow-soft);
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .imgModal__close:hover{ background: rgba(109,99,151,.10); }
+    .imgModal__close:active{ transform: translateY(1px); }
+    .imgModal__body{
+      padding: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(214,205,234,.55);
+    }
+    .imgModal__img{
+      width: 100%;
+      height: auto;
+      max-height: calc(88dvh - 86px);
+      object-fit: contain;
+      display:block;
+      cursor: zoom-out;
+    }
+    /* square edges (matches your no-round preference) */
+    .imgModal, .imgModal__panel, .imgModal__close { border-radius: 0 !important; }
+
   </style>
 </head>
 
@@ -309,7 +388,7 @@
 
       <nav aria-label="Primary">
         <button class="menuBtn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
-          <span class="menuIcon" aria-hidden="true"><span></span></span>
+          <span class="menuIcon" aria-hidden="true"></span>
           <span class="menuText">Menu</span>
         </button>
 
@@ -329,27 +408,28 @@
       <div class="container grid cols-2">
         <div data-reveal>
           <div class="kicker">Portfolio Item</div>
-          <h1>Microplastic Filtration System for Wastewater Treatment</h1>
-          <p class="lead">Concept microplastic filter targeting <b>10–20 μm</b> particles using porous <b>high‑carbon steel</b>, validated via MPI/Ashby selection, porous-strength verification, and Eco‑Audit/LCA.</p>
+          <h1>Custom High-Speed 3D Printer Integration (Ender‑3 Pro Platform)</h1>
+          <p class="lead">Converted a stock Ender‑3 Pro into a high‑speed, high‑precision rapid‑prototyping system via full mechanical, electrical, and firmware redesign</p>
 
           <div class="actions">
             <a class="btn primary" href="../index.html#projects">↳ Back to projects</a>
-            <!-- <a class="btn ghost" href="../assets/docs/[your_report_filename].pdf" download>Design report (PDF)</a> -->
+            <!-- <a class="btn ghost" href="../assets/docs/[your_resume_filename].pdf" download>Resume</a> -->
           </div>
 
+          
           <div class="chips" style="margin-top:14px">
-            <span class="chip">Materials Selection</span>
-            <span class="chip">Porosity Design</span>
-            <span class="chip">Strength Verification</span>
-            <span class="chip">Eco‑Audit / LCA</span>
-            <span class="chip">Systems Thinking</span>
+            <span class="chip">Firmware Integration</span>
+
+            <span class="chip">Mechanical Integration</span>
+            <span class="chip">Systems Integration</span>
+            <span class="chip">Tuning</span>
+            <span class="chip">Root‑Cause Debug</span>
           </div>
 
         </div>
 
         <div class="card hero-stage" data-reveal aria-label="Project hero media">
-          <!-- Swap this image to something like: ../assets/img/microplastic-filter-hero.jpg -->
-          <img src="../assets/img/filter-main.png" alt="Concept microplastic filtration system (replace with project image)" loading="eager" />
+          <img src="../assets/img/printer.jpg" alt="Custom Ender‑3 Pro high‑speed build" loading="eager" />
           <div class="stage-overlay" aria-hidden="true"></div>
         </div>
       </div>
@@ -361,10 +441,10 @@
         <div class="badge"><i aria-hidden="true"></i><span>Overview</span></div>
 
         <div class="kv">
-          <div class="k"><b>Role</b><span>Materials Design Analysis and Project Management</span></div>
-          <div class="k"><b>Timeline</b><span>Jan. 2025 to Feb. 2025</span></div>
-          <div class="k"><b>Tools</b><span>ANSYS Granta EduPack, Ashby charts, MPI ranking, Eco‑Audit/LCA, Excel, Gantt Chart</span></div>
-          <div class="k"><b>Key outcome</b><span>Porous filter spec: ~24M Ø5 μm pores @ ~60% porosity</span></div>
+          <div class="k"><b>Role</b><span>Mechanical / Electrical / Firmware Integrator</span></div>
+          <div class="k"><b>Timeline</b><span>Sept. 2024 to Oct. 2024</span></div>
+          <div class="k"><b>Tools</b><span>Klipper, Raspberry Pi Zero 2 W, PrusaSlicer/OrcaSlicer, CAD, Linux CLI, PowerShell/SSH</span></div>
+          <div class="k"><b>Result</b><span>200 mm/s stable</span></div>
         </div>
       </div>
     </section>
@@ -373,63 +453,66 @@
     <section>
       <div class="container grid cols-2">
         <article class="panel" data-reveal>
-          <h2>Overview</h2>
+          
+          <h2>Project overview</h2>
           <p class="muted">
-            This project develops a concept microplastic filter for wastewater treatment, focused on removing <b>10–20 μm</b> microplastics/microbeads while balancing mechanical durability, manufacturability, and environmental impact. Using materials selection methods and lifecycle analysis, I selected <b>high‑carbon steel</b> and designed a porous filtration structure with <b>~24,000,000 pores (Ø5 μm)</b> at <b>~59.5–60% porosity</b>, then verified the associated reduction in yield strength to <b>~108.6–111 MPa</b>.
+            The stock Creality Ender-3 Pro lacks the out-of-the-box speed necessary for efficient functional prototyping. Standard consumer-grade hardware creates a bottleneck in the design process, as high-quality prints require significant time investments. To eliminate this bottleneck within the prototyping phases, this low‑cost 3D printer was converted into a high‑speed, rapid‑prototyping system to reduce print times for functional prototypes and design in future projects.
+            With the final goal of pushing performance limits while maintaining dimensional accuracy, reliability, and repeatability comparable to
+            commercial printers in a higher price bracket.
           </p>
 
-          <h2 style="margin-top:12px">Problem</h2>
-          <p class="muted">
-            Wastewater effluent can contain microplastics, and the project target was to design a filter concept that supports a goal of <b>≤1 particle/L effluent</b> while remaining durable and sustainable.
-          </p>
-
-          <h2 style="margin-top:12px">My role</h2>
+          <h2 style="margin-top:12px">Engineering objectives</h2>
           <ul>
-            <li>Built the material selection rationale (Ashby charts + MPI ranking)</li>
-            <li>Sized pore geometry and calculated porosity/structure parameters</li>
-            <li>Checked porous-strength reduction vs a design threshold</li>
-            <li>Quantified environmental impact using Eco‑Audit/LCA outputs</li>
+            <li>Increase maximum stable print speed without sacrificing print quality.</li>
+            <li>Reduce vibration‑induced artifacts through data‑driven motion tuning.</li>
+            <li>Improve system uptime via wiring + firmware redesign.</li>
+            <li>Expand material volumetric flow performance to increase throughput.</li>
+            <li>Deliver professional‑grade performance using cost‑efficient upgrades.</li>
           </ul>
 
-          <h2 style="margin-top:12px">Engineering approach</h2>
+
+          <h2 style="margin-top:12px">Constraints</h2>
+          
+          <ul>
+            <li>Low‑cost base platform (Ender‑3 Pro) with tight budget constraints (<350 CAD).</li>
+            <li>Maintain accuracy and reliability at high acceleration / high volumetric flow.</li>
+            <li>Minimize toolhead mass while maximizing cooling and rigidity of housing.</li>
+            <li>Ensure safe electrical design (thermistors, power stability, signal integrity).</li>
+          </ul>
+
+
+          <h2 style="margin-top:12px">Approach</h2>
+          
           <ol>
-            <li><b>Requirements + constraints:</b> Defined filtration scale (<b>10–20 μm</b>), durability expectations, and sustainability constraints (recyclability + reduced CO₂/energy).</li>
-            <li><b>Material selection:</b> Used an <b>MPI (material performance index)</b> and a decision matrix to compare candidate steels, selecting high‑carbon steel as the best tradeoff for durability/strength and suitability for the environment.</li>
-            <li><b>Porous filter architecture:</b> Designed the filtration structure around <b>Ø5 μm pores</b>, totaling <b>~24M pores</b>, producing <b>~0.595–0.60 porosity</b> to enable filtration performance. (Porosity <b>[void fraction]</b> is the fraction of empty volume in a material.)</li>
-            <li><b>Strength verification under porosity:</b> Accounted for strength loss from porosity: baseline yield strength (<b>~678.5 MPa</b>) reduced to <b>~108.6–111 MPa</b> effective yield at <b>~60% porosity</b> (reported safety factor near <b>~1.08</b> in the workflow).</li>
-            <li><b>Sustainability assessment:</b> Ran <b>Eco‑Audit (lifecycle estimator)</b> <b>[a tool that estimates energy/CO₂ across a product’s life]</b> and recorded impact for the selected material; the project values note <b>~2.01 MJ/unit</b> and <b>~0.148 kg CO₂‑eq/unit</b> for the high‑carbon steel option and highlight high recyclability (<b>~90%</b>).</li>
+            <li><b>Mechanical integration:</b> Installed BMG dual‑gear extruder, Volcano high‑flow hotend, BLTouch probing, and ADXL345 accelerometer; Used custom toolhead mounts/ducts using parametric CAD to model and predict compatibity with printer; Upgraded to dual Z-axis to increase stability for higher prints; Replaced standard bed plate for spring steel plate for better adhesion and ease of use; </li>
+            <li><b>Firmware & motion control:</b> Migrated to Klipper on a Raspberry Pi Zero 2W; ran accelerometer‑based resonance testing and applied input shaping; tuned acceleration, pressure advance, and related motion parameters for stability and speed.</li>
+            <li><b>Electrical reliability:</b> Built custom JST‑XH wiring and improved cable routing; diagnosed thermistor faults, firmware issues, and power‑related failures; validated safety and signal integrity with multimeter diagnostics.</li>
+            <li><b>Testing & optimization:</b> Iterated with calibration geometry and real parts; compared slicer configs and volumetric flow limits to find bottlenecks; logged config changes for reproducibility/version control using benchmark prints (3DBenchy).</li>
           </ol>
+
         </article>
 
         <aside class="panel" data-reveal style="transition-delay:90ms">
           <h2>Results & impact</h2>
+
           <ul>
-            <li><b>Filtration target</b>: <b>10–20 μm</b> particles</li>
-            <li><b>Geometry</b>: <b>~24M pores</b>, <b>Ø5 μm</b>, <b>~59.5–60% porosity</b></li>
-            <li><b>Strength check</b>: <b>~108.6–111 MPa</b> effective yield at ~60% porosity (from ~678.5 MPa base)</li>
-            <li><b>Sustainability</b>: <b>~2.01 MJ/unit</b>, <b>~0.148 kg CO₂‑eq/unit</b>, recyclability ~<b>90%</b></li>
-            <li><b>Outcome</b>: selected high‑carbon steel via matrix ranking and MPI/Ashby validation</li>
+            <li><b>Maximum stable speed</b>: <b>55mm/s</b> → <b>200mm/s</b> (<b>263%</b> increase)</li>
+            <li><b>Average print time</b>: <b>1.5 hours</b> → <b>20 minutes</b> (<b>78%</b> decrease)</li>
+            <!--<li><b>Benchmarking</b>: matched commercial printers costing <b>[cost comparison] CAD</b></li>-->
           </ul>
 
-          <!--<h2 style="margin-top:12px">Artifacts</h2>
-          <p class="muted">Link your deliverables so recruiters can verify fast.</p>-->
-          <div class="actions" style="margin-top:12px">
-            <!--
-            <a class="btn small ghost" href="../assets/docs/Thurs-26_P2_DesignReport.pdf" target="_blank" rel="noopener noreferrer">Design report</a>
-            <a class="btn small ghost" href="../assets/docs/Thurs-26_P2_FinalPresentation.pdf" target="_blank" rel="noopener noreferrer">Final slides</a>
-            -->
+
+          <h2 style="margin-top:12px">Photos</h2>
+          <!--<p class="muted">Photos and tuning artifacts (Klipper configs, input‑shaping plots, calibration prints) make this project easy to verify. Link a short demo clip and your configuration repo if you want recruiters to see proof fast.</p>-->
+
+          <div class="grid" style="grid-template-columns:repeat(2,1fr); gap:.8rem">
+            <div class="card"><img src="../assets/img/toolhead_closeup.jpg" alt="Toolhead closeup" loading="lazy" /></div>
+            <div class="card"><img src="../assets/img/Toolhead-front-left-view-inventor.png" alt="Toolhead assembly in Autodesk Inventor" loading="lazy" /></div>
           </div>
 
-          <h2 style="margin-top:14px">Visuals</h2>
-          <!--<p class="muted">Recommended: screenshots of your Ashby chart, decision matrix, porosity math, and Eco‑Audit plots.</p>-->
-
-          <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem">
-            <div class="card"><img src="../assets/img/granta-MPI-1-min.png" alt="Placeholder image (replace with Ashby/MPI figure)" loading="lazy" /></div>
-            <div class="card"><img src="../assets/img/granta-MPI-2-min.png" alt="Placeholder image (replace with Eco‑Audit plot)" loading="lazy" /></div>
-            <div class="card"><img src="../assets/img/eco-audit-min.png" alt="Placeholder image (replace with Eco‑Audit plot)" loading="lazy" /></div>
-            <div class="card"><img src="../assets/img/filter-decision-matrix-min.png" alt="Placeholder image (replace with Ashby/MPI figure)" loading="lazy" /></div> 
-            <div class="card"><img src="../assets/img/LCA-hcs-min.png" alt="Placeholder image (replace with Eco‑Audit plot)" loading="lazy" /></div>
-            <div class="card"><img src="../assets/img/filter-gantt-chart-min.png" alt="Placeholder image (replace with Eco‑Audit plot)" loading="lazy" /></div>
+          <div class="actions" style="margin-top:14px">
+            <!-- <a class="btn small ghost" href="[github_or_files_url]" target="_blank" rel="noopener noreferrer">GitHub / Files</a>
+            <a class="btn small ghost" href="[demo_video_url]" target="_blank" rel="noopener noreferrer">Demo video</a> -->
           </div>
         </aside>
       </div>
@@ -438,12 +521,14 @@
     <!-- Next steps -->
     <section>
       <div class="container panel" data-reveal>
-        <h2>What I’d do next</h2>
+        <h2>Next improvements</h2>
+        
         <ul>
-          <li>Add pressure‑drop + flow‑rate modeling to connect pore geometry to throughput.</li>
-          <li>Validate clogging/fouling behavior and cleaning cycles (lifecycle durability).</li>
-          <li>Prototype a small coupon (laser‑perforated or sintered porous metal) and test capture rate under controlled particle distributions.</li>
+          <li>Quantify repeatability: print the same calibration part <b>[n]</b> times and report σ (standard deviation) for key dimensions.</li>
+          <li>Document a complete BOM + wiring diagram + failure modes to make the build reproducible for others.</li>
+          <li>Explore higher‑temp materials by adding/enhancing enclosure + thermal management; characterize warping vs chamber temperature.</li>
         </ul>
+
       </div>
     </section>
 
@@ -548,5 +633,105 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
+
+  <!-- Image Lightbox Modal -->
+  <div class="imgModal" id="imgModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="imgModal__panel" role="document">
+      <div class="imgModal__top">
+        <div class="imgModal__title" id="imgModalTitle">Preview</div>
+        <button class="imgModal__close" id="imgModalClose" type="button" aria-label="Close image">✕</button>
+      </div>
+      <div class="imgModal__body">
+        <img class="imgModal__img" id="imgModalImg" alt="" />
+      </div>
+    </div>
+  </div>
+
+
+<script>
+/* Click-to-enlarge (lightbox) */
+(function(){
+  const modal = document.getElementById('imgModal');
+  const modalImg = document.getElementById('imgModalImg');
+  const modalTitle = document.getElementById('imgModalTitle');
+  const closeBtn = document.getElementById('imgModalClose');
+  const main = document.querySelector('main');
+
+  if (!modal || !modalImg || !closeBtn || !main) return;
+
+  let lastActive = null;
+
+  function openLightbox(imgEl){
+    const full = imgEl.getAttribute('data-full') || imgEl.currentSrc || imgEl.src;
+    const alt = (imgEl.getAttribute('alt') || '').trim();
+    lastActive = document.activeElement;
+
+    modalImg.src = full;
+    modalImg.alt = alt || 'Preview image';
+    modalTitle.textContent = alt || 'Preview';
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+
+    // lock background scroll
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    closeBtn.focus({ preventScroll: true });
+  }
+
+  function closeLightbox(){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+
+    // stop loading if user closes fast
+    modalImg.src = '';
+
+    if (lastActive && typeof lastActive.focus === 'function') {
+      lastActive.focus({ preventScroll: true });
+    }
+  }
+
+  // Mark images inside main as zoomable (so Visuals/Photos work automatically)
+  (function markZoomable(){
+    main.querySelectorAll('img').forEach(img => {
+      img.classList.add('zoomable');
+      if (!img.hasAttribute('tabindex')) img.setAttribute('tabindex','0');
+      if (!img.hasAttribute('role')) img.setAttribute('role','button');
+      img.setAttribute('aria-label', (img.getAttribute('alt') || 'Open image') + ' (click to enlarge)');
+    });
+  })();
+
+  // Click (delegated)
+  document.addEventListener('click', (e) => {
+    const img = e.target.closest('main img.zoomable');
+    if (!img) return;
+    openLightbox(img);
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) {
+      e.preventDefault();
+      closeLightbox();
+      return;
+    }
+    const focused = document.activeElement;
+    if ((e.key === 'Enter' || e.key === ' ') && focused && focused.matches && focused.matches('main img.zoomable')) {
+      e.preventDefault();
+      openLightbox(focused);
+    }
+  });
+
+  // Close controls
+  closeBtn.addEventListener('click', closeLightbox);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeLightbox(); });
+  modalImg.addEventListener('click', closeLightbox);
+})();
+</script>
+
 </body>
 </html>
