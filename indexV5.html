@@ -359,6 +359,47 @@
     /* Footer */
     footer{padding:28px 0 52px; color:var(--ink-muted); border-top:1px solid rgba(212,215,225,.9)}
 
+    /* Modal */
+    dialog{
+      width:min(880px, 92vw);
+      border:0;
+      padding:0;
+      border-radius:24px;
+      overflow:hidden;
+      box-shadow: 0 30px 80px rgba(31,41,55,.30);
+      background: rgba(245,235,221,.92);
+    }
+    dialog::backdrop{
+      background: rgba(31,41,55,.35);
+      backdrop-filter: blur(10px) saturate(1.05);
+    }
+    .modal{display:grid; grid-template-columns: 1.05fr .95fr; min-height: min(72vh, 640px)}
+    @media (max-width: 920px){ .modal{grid-template-columns:1fr} }
+    .modal-media{position:relative; min-height: 260px; background: rgba(31,41,55,.10)}
+    .modal-media img{width:100%; height:100%; object-fit:cover}
+    .modal-body{padding:18px 18px 16px}
+    .modal-body h3{margin:0 0 .3rem; font-size:1.35rem; letter-spacing:-.01em}
+    .modal-sub{color:var(--ink-muted); margin:0 0 .9rem}
+    .kv{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin: 12px 0}
+    .kv .k{background:rgba(255,255,255,.45); border:1px solid rgba(109,99,151,.18); border-radius:16px; padding:10px}
+    .kv .k b{display:block; font-size:.85rem; color:var(--ink-muted); margin-bottom:3px}
+    .kv .k span{font-weight:850}
+    .modal-tags{display:flex; gap:.45rem; flex-wrap:wrap; margin-top:10px}
+    .modal-tags .chip{background:rgba(109,99,151,.92)}
+    .modal-actions{display:flex; gap:.6rem; flex-wrap:wrap; margin-top:14px}
+    .close{
+      position:absolute; top:12px; right:12px;
+      background:rgba(245,235,221,.85);
+      border:1px solid rgba(212,215,225,.9);
+      border-radius:14px;
+      padding:.45rem .6rem;
+      cursor:pointer;
+      font-weight:900;
+      display:inline-flex; align-items:center; gap:8px;
+      box-shadow:0 12px 26px rgba(0,0,0,.18);
+    }
+    .close svg{width:16px; height:16px}
+
     /* Back to top + progress */
     .fab{
       position:fixed; right:18px; bottom:18px; z-index:60;
@@ -749,7 +790,7 @@ body.nav-open{ overflow:hidden; }
       <div class="container">
         <h2 class="section-title" data-reveal>Featured projects</h2>
         <p class="section-desc" data-reveal="fade" style="transition-delay:90ms">
-          Filter + search, then click +Details to open the full portfolio item page.
+          Filter + search, open a fast modal, or click through to a dedicated page when you have it.
         </p>
 
         <div class="toolbar" data-reveal="fade" style="transition-delay:140ms">
@@ -803,7 +844,27 @@ body.nav-open{ overflow:hidden; }
     </footer>
   </main>
 
-<button class="fab" id="toTop" type="button" aria-label="Back to top">
+  <dialog id="projectDialog" aria-label="Project details">
+    <div class="modal">
+      <div class="modal-media">
+        <img id="modalImg" alt="" />
+        <button class="close" type="button" id="closeDialog" aria-label="Close project details">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Close
+        </button>
+      </div>
+      <div class="modal-body">
+        <h3 id="modalTitle">—</h3>
+        <p class="modal-sub" id="modalSub">—</p>
+
+        <div class="kv" id="modalKv"></div>
+        <div class="modal-tags" id="modalTags"></div>
+        <div class="modal-actions" id="modalActions"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <button class="fab" id="toTop" type="button" aria-label="Back to top">
     <span class="ring" id="ring" aria-hidden="true"></span>
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5l-6 6m6-6l6 6M12 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
@@ -826,7 +887,7 @@ body.nav-open{ overflow:hidden; }
 
     const slides = [
       {
-        badge: 'Stable 200 mm/s',
+        badge: 'Stable 300 mm/s',
         title: 'Custom High‑Speed 3D Printer Integration',
         sub: 'Input‑shaping + sensors → faster prints with fewer artifacts.',
         img: 'assets/img/printer.jpg'
@@ -850,11 +911,11 @@ body.nav-open{ overflow:hidden; }
         id: 'hs-printer',
         title: 'Custom High‑Speed 3D Printer Integration',
         blurb: 'Input‑shaping, BLTouch, BMG; Mechanical, Electrical, Firmware integration.',
-        pill: 'Stable 200 mm/s',
+        pill: 'Stable 300 mm/s',
         pillAlt: false,
         tags: ['Klipper', 'ADXL345', 'Raspberry Pi'],
         img: 'assets/img/printer.jpg',
-        metrics: { 'Speed': '200 mm/s (stable)', 'Ghosting': '↓ 97%' },
+        metrics: { 'Speed': '300 mm/s (stable)', 'Ghosting': '↓ 97%' },
         links: [{ label: 'Project page', href: 'projects/high-speed-printer_lightbox.html' }]
       },
       {
@@ -1017,7 +1078,7 @@ body.nav-open{ overflow:hidden; }
         const chips = p.tags.map(t => `<span class="chip">${t}</span>`).join('');
         const pillClass = p.pillAlt ? 'pill alt' : 'pill';
         return `
-          <article class="card" data-id="${p.id}" data-href="${p.links?.[0]?.href || '#'}" tabindex="0" role="group" aria-label="${p.title}">
+          <article class="card" data-id="${p.id}" tabindex="0" role="group" aria-label="${p.title}">
             <div class="card-media">
               <img src="${p.img}" alt="" loading="lazy" />
               <span class="${pillClass}">${p.pill}</span>
@@ -1027,9 +1088,13 @@ body.nav-open{ overflow:hidden; }
               <p>${p.blurb}</p>
               <div class="meta">${chips}</div>
               <div class="card-actions">
-                <a class="mini" href="${p.links?.[0]?.href || '#'}" data-nav data-magnetic aria-label="Open ${p.title} project page">
+                <button class="mini" type="button" data-open="${p.id}" aria-label="Open details for ${p.title}">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                  + Details
+                  Details
+                </button>
+                <a class="mini" href="${p.links?.[0]?.href || '#'}" data-nav aria-label="Open ${p.title} page">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M10 7h7v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Open
                 </a>
               </div>
             </div>
@@ -1072,32 +1137,52 @@ body.nav-open{ overflow:hidden; }
       });
     }
 
+    // Modal
+    (function initModal(){
+      const dialog = $('#projectDialog');
+      const closeBtn = $('#closeDialog');
+      const img = $('#modalImg');
+      const title = $('#modalTitle');
+      const sub = $('#modalSub');
+      const kv = $('#modalKv');
+      const tags = $('#modalTags');
+      const actions = $('#modalActions');
 
-    // Card click: open project page (same as +Details)
-    (function initCardNavigation(){
+      const openProject = (id) => {
+        const p = projects.find(x => x.id === id);
+        if (!p) return;
+
+        img.src = p.img;
+        img.alt = '';
+        title.textContent = p.title;
+        sub.textContent = p.blurb;
+
+        kv.innerHTML = Object.entries(p.metrics || {}).map(([k, v]) => `<div class="k"><b>${k}</b><span>${v}</span></div>`).join('');
+        tags.innerHTML = (p.tags || []).map(t => `<span class="chip">${t}</span>`).join('');
+        actions.innerHTML = (p.links || []).map(l => `<a class="btn ghost" href="${l.href}" data-nav data-magnetic>${l.label}</a>`).join('');
+
+        if (typeof dialog.showModal === 'function') dialog.showModal();
+        else alert('Your browser does not support the project modal.');
+      };
+
       document.addEventListener('click', (e) => {
-        const card = e.target.closest('.card[data-href]');
-        if (!card) return;
-
-        // Let normal link clicks work
-        if (e.target.closest('a')) return;
-
-        const href = card.getAttribute('data-href');
-        if (!href || href === '#') return;
-        window.location.href = href;
+        const open = e.target.closest('[data-open]');
+        if (open) openProject(open.getAttribute('data-open'));
       });
 
-      // Keyboard: Enter on focused card opens page
       document.addEventListener('keydown', (e) => {
         if (e.key !== 'Enter') return;
-        const card = document.activeElement?.closest?.('.card[data-href]');
-        if (!card) return;
-        const href = card.getAttribute('data-href');
-        if (!href || href === '#') return;
-        window.location.href = href;
+        const card = document.activeElement?.closest?.('.card[data-id]');
+        if (card) openProject(card.getAttribute('data-id'));
+      });
+
+      closeBtn.addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', (e) => {
+        const rect = dialog.getBoundingClientRect();
+        const inDialog = (rect.top <= e.clientY && e.clientY <= rect.bottom && rect.left <= e.clientX && e.clientX <= rect.right);
+        if (!inDialog) dialog.close();
       });
     })();
-
 
     // Smooth anchor scrolling
     (function initAnchors(){
